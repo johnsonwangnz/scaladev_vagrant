@@ -66,7 +66,61 @@ if [ ! -d "/opt/idea" ]; then
 fi
 
 
+if [ ! -d "/usr/local/hadoop" ]; then
 
+	echo "Install hadoop"
+	
+	echo "Making ssh localhost passwordless for pseudodistributed mode, testing it by : ssh localhost"
+	ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
+	cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+
+
+	
+	wget http://www-us.apache.org/dist/hadoop/common/hadoop-3.1.0/hadoop-3.1.0.tar.gz
+
+	tar -xzvf hadoop-3.1.0.tar.gz
+	sudo mv hadoop-3.1.0 /usr/local/hadoop
+	rm hadoop-3.1.0.tar.gz
+
+	echo "export HADOOP_HOME=/usr/local/hadoop" >> ~/.profile
+	export HADOOP_HOME=/usr/local/hadoop
+	echo "export PATH=$PATH:/usr/local/hadoop/bin:/usr/local/hadoop/sbin" >> ~/.profile
+	export PATH=$PATH:/usr/local/hadoop/bin:/usr/local/hadoop/sbin
+
+	echo "Add pseudodistributed configuration"
+	mkdir -p ~/config
+	mkdir -p ~/hddata
+	cp -r /usr/local/hadoop/etc/hadoop  ~/config
+	#copy config files 
+	cp -r /vagrant/hadoopConfig/. ~/config/hadoop/
+
+
+	echo "export HADOOP_CONF_DIR=/home/vagrant/config/hadoop" >> ~/.profile
+	export HADOOP_CONF_DIR=/home/vagrant/config/hadoop
+
+	echo "Add JAVA_HOME to hadoop-env.sh"
+	#sed -i -e 's@${JAVA_HOME}@/usr/lib/jvm/java-8-oracle@' ~/config/hadoop/hadoop-env.sh
+	echo  'export JAVA_HOME=/usr/lib/jvm/java-8-oracle' >> ~/config/hadoop/hadoop-env.sh
+
+	echo "Formatting namenode"
+	hdfs namenode –format
+	echo "Copy start and stop scripts for hadoop"
+	cp /vagrant/scripts/start-all.sh ~/
+	cp /vagrant/scripts/stop-all.sh ~/
+
+fi
+
+if [ ! -d "/usr/local/spark" ]; then
+
+	echo "Install spark"
+
+	wget http://www-eu.apache.org/dist/spark/spark-2.3.0/spark-2.3.0-bin-hadoop2.7.tgz
+	tar -xzvf spark-2.3.0-bin-hadoop2.7.tgz
+	sudo mv spark-2.3.0-bin-hadoop2.7 /usr/local/spark
+	rm spark-2.3.0-bin-hadoop2.7.tgz
+
+
+fi
 
 echo "Install git and git gui"
 sudo apt-get -y install git
@@ -83,6 +137,18 @@ echo "deb https://dl.bintray.com/sbt/debian /" | sudo tee -a /etc/apt/sources.li
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B84B2DF73499E82A75642AC823
 sudo apt-get update
 sudo apt-get install sbt
+
+echo "Install docker :"
+echo "Issuing following to check docker version"
+echo "sudo docker --version"
+sudo wget -qO- https://get.docker.com/ | sh
+
+echo "Install docker composer"
+echo "Add current user to docker group"
+sudo usermod -aG docker $(whoami)
+
+
+
 
 #echo "re enable auto update apt"
 #sudo systemctl start apt-daily.timer
