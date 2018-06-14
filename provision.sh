@@ -122,6 +122,25 @@ if [ ! -d "/usr/local/spark" ]; then
 
 fi
 
+
+if [ ! -d "/usr/local/kafka" ]; then
+
+	echo "Install kafka"
+	
+		
+	wget http://www-us.apache.org/dist/kafka/1.1.0/kafka_2.11-1.1.0.tgz
+
+	tar -xzf kafka_2.11-1.1.0.tgz
+	sudo mv kafka_2.11-1.1.0 /usr/local/kafka
+	rm kafka_2.11-1.1.0.tgz
+
+	echo "export KAFKA_HOME=/usr/local/kafka" >> ~/.profile
+	export KAFKA_HOME=/usr/local/kafka
+
+fi
+
+
+
 echo "Install git and git gui"
 sudo apt-get -y install git
 sudo apt-get -y install git-gui
