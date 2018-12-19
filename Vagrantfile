@@ -12,8 +12,8 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "boxcutter/ubuntu1604-desktop"
-  config.vm.box_version = "17.0907.1"
+  config.vm.box = "ubuntu/trusty64"
+ # config.vm.box_version = "17.0907.1"
   config.vm.hostname = "scaladev"
 
   # Disable automatic box update checking. If you disable this, then
@@ -53,6 +53,7 @@ Vagrant.configure("2") do |config|
      # Customize the amount of memory on the VM:
      vb.memory = "16382"
 	 vb.cpus = "4"
+	 vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
   end
   #
   # View the documentation for the provider you are using for more
